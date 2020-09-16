@@ -43,6 +43,10 @@ class MainActivity : AppCompatActivity(), Log.Writer {
     }
   }
 
+  override fun playerStatus(src: String) {
+    actionBar?.title = src
+  }
+
   override fun enemyStatus(position: Int, src: String) {
     adapter?.update(position, src)
   }
