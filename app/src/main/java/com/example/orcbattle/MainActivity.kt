@@ -2,6 +2,7 @@ package com.example.orcbattle
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.orcbattle.databinding.ActivityMainBinding
@@ -23,19 +24,29 @@ class MainActivity : AppCompatActivity(), Log.Writer {
     val game = Game.start()
 
     binding.buttonAttack.setOnClickListener {
-      targetingMode = true
-      Log.console("攻撃対象を選択：")
+      targetingMode = false
+      if (game.ending != Game.Ending.PLAYING) {
+        Log.console("リセットしてください")
+      } else {
+        targetingMode = true
+        Log.console("攻撃対象を選択：")
+      }
     }
 
     binding.buttonMagic.setOnClickListener {
       targetingMode = false
-      Log.console("魔法による攻撃！")
-      game.magicalAttack()
+      if (game.ending != Game.Ending.PLAYING) {
+        Log.console("リセットしてください")
+      } else {
+        Log.console("魔法による攻撃！")
+        game.magicalAttack()
+      }
     }
 
     binding.enemyList.layoutManager = LinearLayoutManager(this)
     binding.enemyList.adapter = EnemyListAdapter(game.getEnemyStatusList()) { position ->
       if (targetingMode) {
+        targetingMode = false
         game.normalAttack(position)
       }
     }.also {
@@ -44,7 +55,7 @@ class MainActivity : AppCompatActivity(), Log.Writer {
   }
 
   override fun playerStatus(src: String) {
-    actionBar?.title = src
+    title = src
   }
 
   override fun enemyStatus(position: Int, src: String) {
@@ -55,6 +66,7 @@ class MainActivity : AppCompatActivity(), Log.Writer {
     binding.logList.addView(TextView(this).apply {
       text = src
     })
+    binding.logContainer.fullScroll(View.FOCUS_DOWN)
   }
 
   override fun onResume() {
